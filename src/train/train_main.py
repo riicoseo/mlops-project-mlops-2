@@ -1,16 +1,22 @@
 import mlflow
+import io
 import mlflow.lightgbm
 import pandas as pd
+from datetime import datetime
 import lightgbm as lgb
 from lightgbm import early_stopping
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 import numpy as np
-from data.preprocess import load_data, preprocess, save_processed_data
+import matplotlib.pyplot as plt
+from src.data.preprocess import load_data, preprocess, save_processed_data
+import os
+import joblib
 
 def train_main():
+
     mlflow.set_tracking_uri("http://43.200.183.125:5000/")
-    mlflow.set_experiment("movie_rating_prediction")
+    mlflow.set_experiment("movie_rating")
 
     # 1. 데이터 로드 & 전처리
     raw_df = load_data()
@@ -38,46 +44,63 @@ def train_main():
     lgb_train = lgb.Dataset(X_train, y_train)
     lgb_valid = lgb.Dataset(X_valid, y_valid)
 
-    with mlflow.start_run():
+    run_name = f"lgbm_training_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    with mlflow.start_run(run_name=run_name) as run:
+        evals_result = {}
         model = lgb.train(
             params,
             lgb_train,
             valid_sets=[lgb_train, lgb_valid],
-            num_boost_round=3000,
-            callbacks=[early_stopping(stopping_rounds=100)]
+            num_boost_round=4000,
+            callbacks=[
+                early_stopping(stopping_rounds=100),
+                lgb.record_evaluation(evals_result) 
+                ]
         )
 
         # 평가
         preds = model.predict(X_valid)
         rmse = np.sqrt(mean_squared_error(y_valid, preds))
 
-        # MLflow 로깅 & 모델 저장
+        # 7. MLflow: 학습 곡선 시각화 → artifacts 저장
+        plt.figure()
+        lgb.plot_metric(evals_result, metric='rmse')
+        plt.title("Training Curve (RMSE)")
+        curve_path = "training_curve.png"
+        plt.savefig(curve_path)
+        plt.close()
+        mlflow.log_artifact(curve_path)
 
-        input_example = X_train.iloc[:5]  # 5개 행 예시
-        from mlflow.models import infer_signature
-        signature = infer_signature(X_train, model.predict(X_train))
+        # 9. MLflow: 파라미터 / 메트릭 기록
         mlflow.log_params(params)
         mlflow.log_metric("rmse", rmse)
+
+  
+        #  MLflow:  모델 저장
+        from mlflow.models import infer_signature
+        signature = infer_signature(X_train, model.predict(X_train))
         mlflow.lightgbm.log_model(
             model,
             name="lgb_model",
-            input_example=input_example,
+            input_example= X_train.iloc[:5] ,
             signature=signature
         )
 
         # 로컬에 모델 저장
-        import os
-        MODEL_DIR = os.path.join("src", "models")
-        os.makedirs(MODEL_DIR, exist_ok=True)
-        MODEL_PATH = os.path.join(MODEL_DIR, "lgb_model.txt")
-        model.save_model(MODEL_PATH)
-        
-        features = X_train.columns.tolist()
-        import joblib
-        joblib.dump(features, "src/models/feature_list.pkl")
+        os.makedirs("src/models", exist_ok=True)
+        model.save_model("src/models/lgb_model.txt")
+        joblib.dump(X_train.columns.tolist(), "src/models/feature_list.pkl")
+        mlflow.log_artifact("src/models/lgb_model.txt")
+        mlflow.log_artifact("src/models/feature_list.pkl")
+
+        # 11. 전처리된 데이터를 버퍼로 저장 → 재현성 확보
+        csv_buffer = io.StringIO()
+        df.to_csv(csv_buffer, index=False)
+        mlflow.log_text(csv_buffer.getvalue(), "processed_train.csv")
 
         print(f"RMSE: {rmse:.4f}")
 
 
 if __name__ == "__main__":
     train_main()
+

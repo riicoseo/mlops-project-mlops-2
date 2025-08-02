@@ -8,7 +8,7 @@ import joblib
 
 from sklearn.metrics import mean_squared_error
 
-from data.preprocess import preprocess
+from src.data.preprocess import preprocess
 
 MODEL_PATH = os.path.join("src", "models", "lgb_model.txt")
 RAW_TEST_PATH = os.path.join("data","raw", "discover_movies_test_set.csv")
