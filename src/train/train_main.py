@@ -15,7 +15,7 @@ import joblib
 
 def train_main():
 
-    mlflow.set_tracking_uri("http://43.200.183.125:5000/")
+    mlflow.set_tracking_uri("http://14.38.177.115:5000/")
     mlflow.set_experiment("movie_rating")
 
     # 1. 데이터 로드 & 전처리
