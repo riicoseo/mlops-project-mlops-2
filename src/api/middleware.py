@@ -10,8 +10,8 @@ def register_middleware(app):
         CORSMiddleware,
         allow_origins=["*"],
         allow_credentials=True,
-        allow_method=["*"],
-        allow_header=["*"]
+        allow_methods=["*"],
+        allow_headers=["*"]
     )
 
     @app.middleware("http")
