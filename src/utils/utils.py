@@ -1,16 +1,62 @@
-def as_dict(obj):
-    from tmdbv3api.as_obj import AsObj
+import os
+import random
+import joblib
+import hashlib
 
-    if isinstance(obj, AsObj):
-        return {k: as_dict(v) for k, v in obj.__dict__.items()}
+import numpy as np
 
-    if isinstance(obj, dict):
-        # crew, cast 같은 경우 '_json' 내부에 리스트가 들어있으면 꺼내줌
-        if '_json' in obj and isinstance(obj['_json'], list):
-            return as_dict(obj['_json'])
-        return {k: as_dict(v) for k, v in obj.items()}
+def init_seed(seed:int = 0):
+    np.random.seed(seed)
+    random.seed(seed)
 
-    if isinstance(obj, (list, tuple)):
-        return [as_dict(v) for v in obj]
+# /dev/mlops/
+def project_path():
+    return os.path.join(
+        os.path.dirname(
+            os.path.abspath(__file__)
+        ), "..", ".."
+    )
 
-    return obj
+# /dev/mlops/models/{model_name}
+def model_dir(model_name):
+    return os.path.join(
+        project_path(),
+        "models",
+        model_name
+    )
+
+
+
+def save_artifacts_bundle(tfidf_vectorizer, genre2idx, embedding_module, path="cache/artifacts_bundle.pkl"):
+    os.makedirs(os.path.join(project_path(), "src", "dataset", os.path.dirname(path)), exist_ok = True)
+
+    path = os.path.join(project_path(), "src", "dataset", path)
+
+
+    artifacts = {
+        "genre2idx": genre2idx,
+        "tfidf_vectorizer": tfidf_vectorizer,
+        "embedding_state_dict": embedding_module.state_dict(),
+    }
+
+    joblib.dump(artifacts, path)
+    print(f"✅ Artifacts bundled and saved to: {path}")
+
+
+def load_artifacts_bundle(embedding_module_class, path = "cache/artifacts_bundle.pkl", emb_dim=32):
+
+    path = os.path.join(project_path(), "src", "dataset", path)
+    
+    artifacts = joblib.load(path)
+
+    tfidf_vectorizer = artifacts["tfidf_vectorizer"]
+    genre2idx_raw = artifacts["genre2idx"]
+
+    genre2idx = {str(k): v for k, v in genre2idx_raw.items()}
+
+    emb_module = embedding_module_class(set(genre2idx.keys()), emb_dim=emb_dim)
+    emb_module.load_state_dict(artifacts["embedding_state_dict"])
+    return tfidf_vectorizer, genre2idx, emb_module
+
+def default_to_unk():
+    return 0

@@ -40,15 +40,14 @@ def filter_custom_params(model, user_defined_params: dict):
 
 
 def model_save(model, all_params, model_params, tf_idf, embedding_module, genre2idx,
-               rmse, update_checkpoint=True):
+               timestamp, rmse, update_checkpoint=True):
     model_path = os.path.join(project_path(), 'models') 
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
 
     file_name = type(model).__name__
-    current_time = datetime.datetime.now().strftime("%y%m%d%H%M%S")
 
-    dst = os.path.join(model_path, f"{file_name}_T{current_time}.pkl") # mlops/models/modelclass_T현재시간.pkl
-
+    dst = os.path.join(model_path, f"{file_name}_{timestamp}.pkl") # mlops/models/modelclass_T현재시간.pkl
+    
     save_data = {
         "model": model,
         "model_params": model_params,
@@ -56,7 +55,7 @@ def model_save(model, all_params, model_params, tf_idf, embedding_module, genre2
         "embedding_module": embedding_module,
         "genre2idx": genre2idx,
         "rmse": rmse,
-        "timestamp": current_time
+        "timestamp": timestamp
     }
 
     joblib.dump(save_data, dst)
@@ -151,7 +150,8 @@ def run_train(model_name, **kwargs):
 
 
 if __name__ == "__main__":
-    fire.Fire({
-        "train": run_train,
-    }
-    )
+    # fire.Fire({
+    #     "train": run_train,
+    # }
+    # )
+    run_train()
