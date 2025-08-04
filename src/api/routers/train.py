@@ -22,7 +22,7 @@ async def train_model(request: TrainRequest, background_tasks: BackgroundTasks):
     )
 
     KST = timezone(timedelta(hours=9))
-    timestamp = datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now(KST).strftime("%Y-%m-%d %H%M%S")
 
     return {
         "status": status.HTTP_202_ACCEPTED,

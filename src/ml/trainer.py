@@ -117,7 +117,7 @@ def train_and_log_model(model_name, **kwargs):
     X_test, y_test = test_dataest.features, test_dataest.target
 
     KST = timezone(timedelta(hours=9))
-    timestamp = datetime.now(KST).strftime("%Y%m%d_%H:%M:%S")
+    timestamp = datetime.now(KST).strftime("%Y%m%d_%H%M%S")
     run_name = f"{model_name}_training_{timestamp}"
 
     with mlflow.start_run(run_name=run_name) as run:
