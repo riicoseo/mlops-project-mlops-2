@@ -13,14 +13,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Starting deployment to EC2
-      run: echo "::notice::Starting deployment to EC2..."
+    - name: "[START] deployment to EC2"
+      run: echo "Starting deployment to EC2..."  
 
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Checkout Success
-      run: echo "::notice::[Success] checkout to main branch"
+    - name: "[SUCCESS] Checkout"
+      run: echo "[SUCCESS] checkout to main branch"    
 
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.8.0
@@ -28,7 +28,7 @@ jobs:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
     - name: Connecting to EC2 for deployment
-      run: echo "::notice::Connecting to EC2 for deployment..."
+      run: echo "Connecting to EC2 for deployment"
 
     - name: Deploy to EC2
       run: |
@@ -38,21 +38,27 @@ jobs:
           echo "Moving to project directory..."
           cd /home/ubuntu/workspace/yoon/mlops-project-mlops-2
 
+          echo ""
           branch_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
           echo "[EC2][Branch][now] : $branch_name"
+          echo ""
 
           echo "[EC2][Branch][checkout]"
           git fetch origin main
           git checkout -B main origin/main
 
+          echo ""
           echo "[EC2][Recent Commit info] : $(git log -1 --oneline)"
+          echo ""
 
           if [ -f requirements.txt ]; then 
             pip install --upgrade -r requirements.txt; 
           fi
 
-          sudo systemctl status myapp --no-pager
+          sudo systemctl status myapp --no-pager | head -n 5
+          echo ""
           sudo systemctl restart myapp
-          sudo systemctl status myapp --no-pager
+          echo ""
+          sudo systemctl status myapp --no-pager | head -n 5
         
         EOF
