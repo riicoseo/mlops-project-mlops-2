@@ -19,7 +19,6 @@ from lightgbm import LGBMRegressor
 from src.dataset.movie_rating import get_datasets, MovieRatingDataset, GenreEmbeddingModule
 from src.evaluate.evaluate import evaluate
 from src.ml.config import init_mlflow
-from src.data.preprocess import load_data, preprocess
 from src.utils.logger import get_logger
 from src.utils.utils import init_seed, model_dir, project_path
 from src.utils.enums import ModelType
