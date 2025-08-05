@@ -1,0 +1,16 @@
+name: movie_rating
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10.13
+  - pip
+  - pip:
+      - fastapi
+      - uvicorn
+      - mlflow
+      - scikit-learn
+      - pandas
+      - numpy
+      - python-dotenv
+      - lightgbm
