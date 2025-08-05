@@ -1,11 +1,8 @@
-
-
-
-
 import io
 import os
 import sys
 import joblib
+
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
@@ -180,7 +177,7 @@ def train_and_log_model(model_name, **kwargs):
 
         mlflow.pyfunc.log_model(
             artifact_path = "movie_rating_model",
-            python_model=MovieRatingModel(model = model)
+            python_model=MovieRatingModel(model = model),
             artifacts={
                 "artifacts_bundle" : artifact_path
             }
