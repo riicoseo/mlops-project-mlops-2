@@ -40,7 +40,7 @@ def filter_custom_params(model, user_defined_params: dict):
 def model_save(model, all_params, model_params, tf_idf, embedding_module, genre2idx,
                timestamp, rmse, update_checkpoint=True):
     model_path = os.path.join(project_path(), 'models') 
-    os.makedirs(os.path.dirname(model_path), exist_ok=True)
+    os.makedirs(model_path, exist_ok=True)
 
     file_name = type(model).__name__
 
