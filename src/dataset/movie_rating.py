@@ -94,7 +94,8 @@ class MovieRatingDataset:
 
 
     # tfidf_df
-    def clean_korean_text(self, text):
+    @staticmethod
+    def clean_korean_text(text):
         text = re.sub(r'[^가-힣\s]', '', str(text))
         return text.strip()
     

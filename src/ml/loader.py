@@ -34,4 +34,13 @@ def load_mlflow_model(model_uri: str):
 
     except Exception as e:
         logger.error(f"[ERROR] failed to load mlflow model : {e}")
-        raise    
+        raise
+
+
+_mlflow_model = None
+
+def get_model():
+    global _mlflow_model
+    if _mlflow_model is None:
+        _mlflow_model = load_mlflow_model("models:/best_model/Production")
+    return _mlflow_model
