@@ -1,7 +1,15 @@
-import mlflow
+
+
+
+
 import io
 import os
+import sys
 import joblib
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
+
 import lightgbm as lgb
 import pandas as pd
 import numpy as np
@@ -11,6 +19,7 @@ from datetime import datetime, timezone, timedelta
 from lightgbm import early_stopping
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+import mlflow
 from mlflow.models import infer_signature
 from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
@@ -19,10 +28,10 @@ from lightgbm import LGBMRegressor
 from src.dataset.movie_rating import get_datasets, MovieRatingDataset, GenreEmbeddingModule
 from src.evaluate.evaluate import evaluate
 from src.ml.config import init_mlflow
-from src.data.preprocess import load_data, preprocess
 from src.utils.logger import get_logger
 from src.utils.utils import init_seed, model_dir, project_path
 from src.utils.enums import ModelType
+from src.models import MovieRatingModel
 
 logger = get_logger(__name__)
 
@@ -159,17 +168,22 @@ def train_and_log_model(model_name, **kwargs):
         )
 
         # 6. MLflow 메트릭 & 파라미터 로깅
+
         mlflow.log_params(custom_params)
         mlflow.log_metric("rmse", valid_rmse)
         mlflow.set_tag("model_timestamp", timestamp)
+        
+        artifact_path = os.path.join(project_path(),"src","dataset","cache", "artifacts_bundle.pkl")
 
         # 7. 모델 저장
         signature = infer_signature(X_train, model.predict(X_train))
-        mlflow.sklearn.log_model(
-            sk_model=model,
-            name=type(model).__name__,
-            input_example=X_train.iloc[:5],
-            signature=signature
+
+        mlflow.pyfunc.log_model(
+            artifact_path = "movie_rating_model",
+            python_model=MovieRatingModel(model = model)
+            artifacts={
+                "artifacts_bundle" : artifact_path
+            }
         )
 
         # 8-1. mlflow artifact 에 저장
