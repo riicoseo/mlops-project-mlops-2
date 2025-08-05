@@ -206,7 +206,3 @@ def train_and_log_model(model_name, **kwargs):
         mlflow.log_artifact(dst)
 
         logger.info(f"[{run_name}][{model_type.value.upper()}] RMSE: {valid_rmse:.4f}")
-
-
-
-
