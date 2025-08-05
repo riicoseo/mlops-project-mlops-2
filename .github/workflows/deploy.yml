@@ -13,19 +13,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Starting deployment to EC2
+      run: echo "Starting deployment to EC2..."  
+
     - name: Checkout Repository
       uses: actions/checkout@v3
+
+    - name: Checkout Success
+      run: echo "[Success] checkout to main branch"    
 
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.8.0
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
+    - name: Connecting to EC2 for deployment
+      run: echo "Connecting to EC2 for deployment"  
+
     - name: Deploy to EC2
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           cd /home/ubuntu/workspace/yoon/mlops-project-mlops-2
-          git pull origin main
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+          echo "[EC2][Branch][now] : "
+          git rev-parse --abbrev-ref HEAD || true
+
+          echo "[EC2][Branch][checkout] : "
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
+          echo "[EC2][Recent Commit info] : "
+          git log -1 --oneline
+
+          if [ -f requirements.txt ]; then 
+            pip install -r requirements.txt; 
+          fi
+          
           sudo systemctl restart myapp
+        
         EOF
