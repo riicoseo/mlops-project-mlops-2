@@ -178,10 +178,18 @@ def read_dataset():
     df = pd.DataFrame(data['movies'])
     return df
 
+
 def split_dataset(df):
     train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
     train_df, test_df = train_test_split(train_df, test_size=0.2, random_state=42)
     return train_df, val_df, test_df
+
+
+def get_genre_decode():
+    movie_rating_path = os.path.join(project_path(),"data-prepare","result")
+    with open(movie_rating_path +"/popular.json","r", encoding= 'utf-8')as f:
+        data = json.load(f)
+    return data['genre_decode']
 
 
 def get_datasets(path="cache", use_cache=True):
@@ -238,6 +246,7 @@ def get_datasets(path="cache", use_cache=True):
 if __name__ == "__main__":
     print('test 중 입니다.')
     train, valid, test = get_datasets()
-    print("train set 첫번째 행 : ", train[0])
+    print("train set 첫번째 행 : ", train.features.columns)
     print("valid set 첫번째 행 : ", valid[0])
-    print("test set 첫번째 행 : ", test[0])
+    # print("test set 첫번째 행 : ", test[0])
+    print(get_genre_decode())
