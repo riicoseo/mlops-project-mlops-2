@@ -1,0 +1,75 @@
+2025-08-05 18:43:35 [INFO] [app.src.api] - 서버 시작 Step
+2025-08-05 18:43:35 [INFO] [app.src.api] - [START] loading mlflow model
+2025-08-05 18:43:35 [INFO] [app.src.ml.loader] - [START] try to load MLflow model: models:/best_model/Production
+2025-08-05 18:43:36 [INFO] [app.src.ml.loader] - [INFO] Loaded MLflow model
+2025-08-05 18:43:36 [INFO] [app.src.ml.loader] -        Run ID: caf766a1ce1842ed9bab2b2702f9708d
+2025-08-05 18:43:36 [INFO] [app.src.ml.loader] -        Run Name: xgboost_training_20250804_16:24:08
+2025-08-05 18:43:36 [INFO] [app.src.ml.loader] -        Model Timestamp: 20250804_16:24:08
+2025-08-05 18:43:36 [INFO] [app.src.api] - [END] mlflow model loaded
+2025-08-05 18:45:01 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/
+2025-08-05 18:45:01 [INFO] [app.src.api.middleware] - [Res] 404
+2025-08-05 18:45:01 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/favicon.ico
+2025-08-05 18:45:01 [INFO] [app.src.api.middleware] - [Res] 404
+2025-08-05 18:45:04 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/train
+2025-08-05 18:45:04 [INFO] [app.src.api.middleware] - [Res] 307
+2025-08-05 18:45:04 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/train/
+2025-08-05 18:45:04 [INFO] [app.src.api.middleware] - [Res] 405
+2025-08-05 18:45:10 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/predict
+2025-08-05 18:45:10 [INFO] [app.src.api.middleware] - [Res] 404
+2025-08-05 18:45:14 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/docs
+2025-08-05 18:45:14 [INFO] [app.src.api.middleware] - [Res] 200
+2025-08-05 18:45:15 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/openapi.json
+2025-08-05 18:45:15 [INFO] [app.src.api.middleware] - [Res] 200
+2025-08-05 18:46:22 [INFO] [app.src.api] - 서버 종료
+2025-08-05 21:59:32 [INFO] [app.src.api] - 서버 시작 Step
+2025-08-05 21:59:32 [INFO] [app.src.api] - [START] loading mlflow model
+2025-08-05 21:59:32 [INFO] [app.src.ml.loader] - [START] try to load MLflow model: models:/best_model/Production
+2025-08-05 21:59:33 [INFO] [app.src.ml.loader] - [INFO] Loaded MLflow model
+2025-08-05 21:59:33 [INFO] [app.src.ml.loader] -        Run ID: caf766a1ce1842ed9bab2b2702f9708d
+2025-08-05 21:59:33 [INFO] [app.src.ml.loader] -        Run Name: xgboost_training_20250804_16:24:08
+2025-08-05 21:59:33 [INFO] [app.src.ml.loader] -        Model Timestamp: 20250804_16:24:08
+2025-08-05 21:59:33 [INFO] [app.src.api] - [END] mlflow model loaded
+2025-08-05 22:00:35 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/train
+2025-08-05 22:00:35 [INFO] [app.src.api.middleware] - [Res] 307
+2025-08-05 22:00:35 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/train/
+2025-08-05 22:00:35 [INFO] [app.src.api.middleware] - [Res] 405
+2025-08-05 22:00:41 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/docs
+2025-08-05 22:00:41 [INFO] [app.src.api.middleware] - [Res] 200
+2025-08-05 22:00:42 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/openapi.json
+2025-08-05 22:00:42 [INFO] [app.src.api.middleware] - [Res] 200
+2025-08-05 22:03:39 [INFO] [app.src.api] - 서버 종료
+2025-08-05 22:03:42 [INFO] [app.src.api] - 서버 시작 Step
+2025-08-05 22:03:42 [INFO] [app.src.api] - [START] loading mlflow model
+2025-08-05 22:03:42 [INFO] [app.src.ml.loader] - [START] try to load MLflow model: models:/best_model/Production
+2025-08-05 22:03:43 [INFO] [app.src.ml.loader] - [INFO] Loaded MLflow model
+2025-08-05 22:03:43 [INFO] [app.src.ml.loader] -        Run ID: caf766a1ce1842ed9bab2b2702f9708d
+2025-08-05 22:03:43 [INFO] [app.src.ml.loader] -        Run Name: xgboost_training_20250804_16:24:08
+2025-08-05 22:03:43 [INFO] [app.src.ml.loader] -        Model Timestamp: 20250804_16:24:08
+2025-08-05 22:03:43 [INFO] [app.src.api] - [END] mlflow model loaded
+2025-08-05 22:03:58 [INFO] [app.src.api] - 서버 종료
+2025-08-05 22:08:47 [INFO] [app.src.api] - 서버 시작 Step
+2025-08-05 22:08:47 [INFO] [app.src.api] - [START] loading mlflow model
+2025-08-05 22:08:47 [INFO] [app.src.ml.loader] - [START] try to load MLflow model: models:/best_model/Production
+2025-08-05 22:08:48 [INFO] [app.src.ml.loader] - [INFO] Loaded MLflow model
+2025-08-05 22:08:48 [INFO] [app.src.ml.loader] -        Run ID: caf766a1ce1842ed9bab2b2702f9708d
+2025-08-05 22:08:48 [INFO] [app.src.ml.loader] -        Run Name: xgboost_training_20250804_16:24:08
+2025-08-05 22:08:48 [INFO] [app.src.ml.loader] -        Model Timestamp: 20250804_16:24:08
+2025-08-05 22:08:48 [INFO] [app.src.api] - [END] mlflow model loaded
+2025-08-05 22:09:22 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/docs
+2025-08-05 22:09:22 [INFO] [app.src.api.middleware] - [Res] 200
+2025-08-05 22:09:22 [INFO] [app.src.api.middleware] - [Req] GET http://localhost:8000/openapi.json
+2025-08-05 22:09:22 [INFO] [app.src.api.middleware] - [Res] 200
+2025-08-05 22:18:48 [INFO] [app.src.ml.trainer] - [randomforest_training_20250805_221820][RANDOMFOREST] RMSE: 1.9948
+2025-08-05 22:52:41 [INFO] [app.src.ml.trainer] - [randomforest_training_20250805_225214][RANDOMFOREST] RMSE: 1.9948
+2025-08-05 22:56:23 [INFO] [app.src.ml.trainer] - [randomforest_training_20250805_225555][RANDOMFOREST] RMSE: 1.9948
+2025-08-05 22:58:48 [INFO] [app.src.ml.trainer] - [randomforest_training_20250805_225821][RANDOMFOREST] RMSE: 1.9948
+2025-08-05 22:59:44 [INFO] [app.src.ml.trainer] - [randomforest_training_20250805_225912][RANDOMFOREST] RMSE: 1.9948
+2025-08-05 23:02:18 [INFO] [app.src.ml.trainer] - [randomforest_training_20250805_230146][RANDOMFOREST] RMSE: 1.9948
+2025-08-05 23:04:33 [INFO] [app.src.ml.trainer] - [lightgbm_training_20250805_230419][LIGHTGBM] RMSE: 1.9978
+2025-08-05 23:46:21 [INFO] [app.src.ml.trainer] - [lightgbm_training_20250805_234613][LIGHTGBM] RMSE: 1.9978
+2025-08-05 23:47:30 [INFO] [app.src.ml.trainer] - [lightgbm_training_20250805_234717][LIGHTGBM] RMSE: 1.9978
+2025-08-05 23:48:58 [INFO] [app.src.ml.trainer] - [lightgbm_training_20250805_234844][LIGHTGBM] RMSE: 1.9978
+2025-08-05 23:50:26 [INFO] [app.src.ml.trainer] - [lightgbm_training_20250805_235013][LIGHTGBM] RMSE: 1.9978
+2025-08-05 23:52:50 [INFO] [app.src.ml.trainer] - [lightgbm_training_20250805_235236][LIGHTGBM] RMSE: 1.9978
+2025-08-05 23:53:27 [INFO] [app.src.ml.trainer] - [randomforest_training_20250805_235255][RANDOMFOREST] RMSE: 1.9948
+2025-08-05 23:53:45 [INFO] [app.src.ml.trainer] - [xgboost_training_20250805_235331][XGBOOST] RMSE: 2.0247

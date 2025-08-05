@@ -10,11 +10,12 @@ import mlflow.pyfunc
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn as nn
+import ast
 
-
+from src.dataset.movie_rating import GenreEmbeddingModule
 from src.utils.utils import project_path
 from src.dataset import movie_rating
-
 
 
 class MovieRatingModel(mlflow.pyfunc.PythonModel):
@@ -27,25 +28,42 @@ class MovieRatingModel(mlflow.pyfunc.PythonModel):
 
     def load_context(self, context):
         bundle = joblib.load(context.artifacts["artifacts_bundle"])
-        self.tf_idf = bundle["tf_idf"]
-        self.embedding_module = bundle["embedding_module"]
         self.genre2idx = bundle["genre2idx"]
+        self.tf_idf = bundle["tfidf_vectorizer"]
+        embedding_state = bundle["embedding_state_dict"]
+
+        # 수정: GenreEmbeddingModule 사용
+        self.embedding_module = GenreEmbeddingModule(set(self.genre2idx.keys()))
+        self.embedding_module.load_state_dict(embedding_state)
+        self.embedding_module.eval()
+
+        self.genre_decode = movie_rating.get_genre_decode()
+
 
     def predict(self, context, model_input):
-        # 1. overview 전처리
-        overview_clean = movie_rating.clean_korean_text(model_input["overview"])
-        overview_vec = self.tf_idf.transform([overview_clean])
+        results = []
 
-        # 2. genres
-        genre_names = model_input["genres"] 
-        genre_ids = [self.genre_decode.get(name,0) for name in genre_names]
-        genre_idx_list = [self.genre2idx.get(gid, 0) for gid in genre_ids]
-        genre_tensor = self.embedding_module([genre_idx_list])
-        genre_vec = genre_tensor.cpu().detach().numpy()        
-        
-        # 3. 기타 변수들 전처리
-        meta_features = np.array([[model_input["adult"], model_input["video"], model_input["is_english"]]])
+        for _, row in model_input.iterrows():
+            overview_clean = movie_rating.MovieRatingDataset.clean_korean_text(row["overview"])
+            overview_vec = self.tf_idf.transform([overview_clean])
 
-        X = np.hstack([meta_features, overview_vec.toarray(), genre_vec]) 
+            # genres 처리
+            raw_genres = row["genres"]
+            if isinstance(raw_genres, str):
+                genre_names = ast.literal_eval(raw_genres)
+            else:
+                genre_names = raw_genres
+            genre_ids = [self.genre_decode.get(name, 0) for name in genre_names]
+            genre_idx_list = [self.genre2idx.get(str(gid), 0) for gid in genre_ids]
 
-        return self.model.predict(X).clip(0,10)
+            with torch.no_grad():
+                self.embedding_module.eval()
+                genre_tensor = self.embedding_module([genre_idx_list])
+                genre_vec = genre_tensor.cpu().numpy().reshape(1, -1)
+
+            meta_features = np.array([[row["adult"], row["video"], row["is_english"]]])
+            X = np.hstack([meta_features, overview_vec.toarray(), genre_vec])
+            y_pred = self.model.predict(X).clip(0, 10)
+            results.append(y_pred[0])
+
+        return np.array(results)

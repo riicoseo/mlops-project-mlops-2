@@ -17,7 +17,8 @@ from lightgbm import early_stopping
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 import mlflow
-from mlflow.models import infer_signature
+from mlflow.models import infer_signature, ModelSignature
+from mlflow.types.schema import Schema, ColSpec
 from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 from lightgbm import LGBMRegressor
@@ -28,7 +29,7 @@ from src.ml.config import init_mlflow
 from src.utils.logger import get_logger
 from src.utils.utils import init_seed, model_dir, project_path
 from src.utils.enums import ModelType
-from src.models import MovieRatingModel
+from src.models.MovieRatingModel import MovieRatingModel
 
 logger = get_logger(__name__)
 
@@ -56,7 +57,7 @@ def model_save(model, all_params, model_params, tf_idf, embedding_module, genre2
         "model": model,
         "model_params": model_params,
         "tf_idf": tf_idf,
-        "embedding_module": embedding_module,
+        "embedding_module": embedding_module.state_dict(),
         "genre2idx": genre2idx,
         "rmse": rmse,
         "timestamp": timestamp
@@ -173,21 +174,35 @@ def train_and_log_model(model_name, **kwargs):
         artifact_path = os.path.join(project_path(),"src","dataset","cache", "artifacts_bundle.pkl")
 
         # 7. 모델 저장
-        signature = infer_signature(X_train, model.predict(X_train))
+        input_example = pd.DataFrame([{
+            "overview": "이 영화는 액션과 감동이 넘친다",
+            "genres": '["액션", "모험"]',
+            "adult": 0.0,
+            "video": 0.0,
+            "is_english": 1.0
+        }])
 
+        signature = ModelSignature(
+            inputs=Schema([
+                ColSpec("string", "overview"),
+                ColSpec("string", "genres"),
+                ColSpec("double", "adult"),
+                ColSpec("double", "video"),
+                ColSpec("double", "is_english")
+            ]),
+            outputs=Schema([ColSpec("double")])
+        )
         mlflow.pyfunc.log_model(
-            artifact_path = "movie_rating_model",
-            python_model=MovieRatingModel(model = model),
+            name = "movie_rating_model",
+            python_model= MovieRatingModel(model = model),
             artifacts={
                 "artifacts_bundle" : artifact_path
-            }
+            },
+            input_example=input_example,
+            signature=signature
         )
 
         # 8-1. mlflow artifact 에 저장
         mlflow.log_artifact(dst)
 
         logger.info(f"[{run_name}][{model_type.value.upper()}] RMSE: {valid_rmse:.4f}")
-
-
-
-

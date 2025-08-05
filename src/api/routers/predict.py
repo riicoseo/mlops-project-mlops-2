@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from typing import Optional, List
+from src.ml.loader import load_mlflow_model
 
 router = APIRouter(prefix="/predict")
 

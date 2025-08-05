@@ -5,6 +5,7 @@ import hashlib
 
 import numpy as np
 
+
 def init_seed(seed:int = 0):
     np.random.seed(seed)
     random.seed(seed)
