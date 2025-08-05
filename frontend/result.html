@@ -1,0 +1,33 @@
+<!-- result.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>영화 평점 예측 - 결과</title>
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; background: #f5f6fa; display: flex; justify-content: center; align-items: center; height: 100vh;}
+    .result-container { background: #fff; border-radius: 12px; padding: 40px 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); min-width: 350px;}
+    h2 { margin-bottom: 24px; color: #27408b;}
+    .pred { font-size: 28px; font-weight: bold; color: #3b5998; margin-bottom: 10px; }
+    .btn { width: 100%; background: #27408b; color: #fff; padding: 12px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 18px; }
+    .btn:hover { background: #4169e1;}
+  </style>
+</head>
+<body>
+  <div class="result-container">
+    <h2>예측 결과</h2>
+    <div class="pred" id="pred-value"></div>
+    <button class="btn" onclick="window.location.href='survey.html'">다시 예측하기</button>
+    <button class="btn" onclick="window.location.href='login.html'">로그아웃</button>
+  </div>
+  <script>
+    // 쿼리스트링에서 pred 값 읽어서 표시
+    function getQueryParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+    const pred = getQueryParam('pred');
+    document.getElementById('pred-value').innerText = pred ? `예상 평점: ${pred}` : '결과 없음';
+  </script>
+</body>
+</html>
