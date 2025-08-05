@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from src.api.middleware import register_middleware
-from src.api.routers import train, predict
+from src.api.routers import train, predict, reload
 from src.ml.loader import load_mlflow_model
 from src.utils.logger import get_logger
 
@@ -32,5 +32,6 @@ register_middleware(app)
 
 app.include_router(train.router)
 app.include_router(predict.router)
+app.include_router(reload.router)
 
 
