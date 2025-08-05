@@ -55,10 +55,12 @@ jobs:
             pip install --upgrade -r requirements.txt; 
           fi
 
+          echo "[STATUS][before restart]"
           sudo systemctl status myapp --no-pager | head -n 5
           echo ""
           sudo systemctl restart myapp
           echo ""
+          echo "[STATUS][after restart]"
           sudo systemctl status myapp --no-pager | head -n 5
         
         EOF
