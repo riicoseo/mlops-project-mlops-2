@@ -5,6 +5,7 @@ import time
 import requests
 from tqdm import tqdm
 
+
 class TMDBCrawler:
     def __init__(
         self,
@@ -43,8 +44,19 @@ class TMDBCrawler:
 
         return movies
     
+    def get_genre_name_to_id(self):
+        url = f"https://api.themoviedb.org/3/genre/movie/list?language={self._language}&api_key={self._api_key}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            genres = response.json().get("genres", [])
+            return {genre["name"]: genre["id"] for genre in genres}
+        return {}
+
+
     @staticmethod
-    def save_movies_to_json_file(movies, dst = "./result", filename = "popular"):
-        data = {"movies": movies}
+    def save_movies_to_json_file(movies, genre_name_to_id, dst = "./result", filename = "popular"):
+        os.makedirs(dst, exist_ok = True)
+        data = {"movies": movies,
+                "genre_decode" : genre_name_to_id}
         with open(f"{os.path.join(dst, filename)}.json", "w", encoding = "utf-8") as f:
             f.write(json.dumps(data))
