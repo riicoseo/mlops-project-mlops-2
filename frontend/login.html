@@ -1,0 +1,36 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>영화 평점 예측 - 로그인</title>
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; background: #f5f6fa; display: flex; justify-content: center; align-items: center; height: 100vh;}
+    .login-container { background: #fff; border-radius: 12px; padding: 40px 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.07);}
+    h2 { margin-bottom: 24px; color: #27408b;}
+    label { display: block; margin-bottom: 8px; }
+    input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #ccc;}
+    button { width: 100%; background: #27408b; color: #fff; padding: 12px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #4169e1;}
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>로그인</h2>
+    <form id="login-form">
+      <label for="userid">아이디</label>
+      <input type="text" id="userid" required>
+      <label for="userpw">비밀번호</label>
+      <input type="password" id="userpw" required>
+      <button type="submit">로그인</button>
+    </form>
+  </div>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      // 실제로는 검증 없이 바로 이동!
+      window.location.href = 'survey.html';
+    });
+  </script>
+</body>
+</html>
