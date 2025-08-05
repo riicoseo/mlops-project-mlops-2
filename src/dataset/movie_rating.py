@@ -235,7 +235,7 @@ def get_datasets(path="cache", use_cache=True):
     joblib.dump(test_dataset, test_cache)
 
     # 아티팩트 저장
-    save_artifacts_bundle(train_dataset.tf_idf, train_dataset.genre2idx, train_dataset.embedding_module, path=bundle_path)
+    save_artifacts_bundle(train_dataset.tf_idf, train_dataset.genre2idx, train_dataset.embedding_module.cpu(), path=bundle_path)
     print("💾 전처리 및 아티팩트 캐시 저장 완료!")
 
     return train_dataset, val_dataset, test_dataset

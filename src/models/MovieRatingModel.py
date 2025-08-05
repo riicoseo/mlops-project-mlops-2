@@ -27,8 +27,8 @@ class MovieRatingModel(mlflow.pyfunc.PythonModel):
 
     def load_context(self, context):
         bundle = joblib.load(context.artifacts["artifacts_bundle"])
-        self.tf_idf = bundle["tf_idf"]
-        self.embedding_module = bundle["embedding_module"]
+        self.tf_idf = bundle["tfidf_vectorizer"]
+        self.embedding_module = bundle["embedding_state_dict"]
         self.genre2idx = bundle["genre2idx"]
 
     def predict(self, context, model_input):

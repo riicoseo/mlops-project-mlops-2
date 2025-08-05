@@ -28,7 +28,7 @@ from src.ml.config import init_mlflow
 from src.utils.logger import get_logger
 from src.utils.utils import init_seed, model_dir, project_path
 from src.utils.enums import ModelType
-from src.models import MovieRatingModel
+from src.models.MovieRatingModel import MovieRatingModel
 
 logger = get_logger(__name__)
 
@@ -173,14 +173,28 @@ def train_and_log_model(model_name, **kwargs):
         artifact_path = os.path.join(project_path(),"src","dataset","cache", "artifacts_bundle.pkl")
 
         # 7. 모델 저장
+        X_train = X_train.astype({
+            "adult": "float64",
+            "video": "float64",
+            "is_english": "float64"})
+
         signature = infer_signature(X_train, model.predict(X_train))
 
         mlflow.pyfunc.log_model(
-            artifact_path = "movie_rating_model",
-            python_model=MovieRatingModel(model = model),
+            name = "movie_rating_model",
+            python_model= MovieRatingModel(model = model),
             artifacts={
                 "artifacts_bundle" : artifact_path
-            }
+            },
+            input_example={
+                "overview": "이 영화는 액션과 감동이 넘친다",
+                "genres":["액션","모험"],
+                "adult":0,
+                "video":0,
+                'is_english':1
+            },
+            signature=signature
+
         )
 
         # 8-1. mlflow artifact 에 저장
