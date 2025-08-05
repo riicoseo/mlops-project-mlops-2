@@ -48,9 +48,11 @@ jobs:
           echo "[EC2][Recent Commit info] : $(git log -1 --oneline)"
 
           if [ -f requirements.txt ]; then 
-            pip install -r requirements.txt; 
+            pip install --upgrade -r requirements.txt; 
           fi
-          
+
+          sudo systemctl status myapp --no-pager
           sudo systemctl restart myapp
+          sudo systemctl status myapp --no-pager
         
         EOF
