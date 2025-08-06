@@ -18,14 +18,14 @@ default_args = {
 with DAG(
     dag_id="test111",
     default_args=default_args,
-    description="test333",
+    description="test444",
     schedule_interval=None,
     start_date=None,
     catchup=False,
 ) as dag:
 
     reload_task = PythonOperator(
-        task_id="test111_task",
+        task_id="test444_task",
         python_callable=trigger_reload
     )
 
