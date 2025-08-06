@@ -173,7 +173,7 @@ class MovieRatingDataset:
         self.okt = Okt() 
 
 def read_dataset():
-    movie_rating_path = os.path.join(project_path(),"data-prepare","result")
+    movie_rating_path = os.path.join(project_path(),"data_prepare","result")
     with open(movie_rating_path +"/popular.json","r", encoding= 'utf-8')as f:
         data = json.load(f)
     df = pd.DataFrame(data['movies'])
@@ -187,7 +187,7 @@ def split_dataset(df):
 
 
 def get_genre_decode():
-    movie_rating_path = os.path.join(project_path(),"data-prepare","result")
+    movie_rating_path = os.path.join(project_path(),"data_prepare","result")
     with open(movie_rating_path +"/popular.json","r", encoding= 'utf-8')as f:
         data = json.load(f)
     return data['genre_decode']

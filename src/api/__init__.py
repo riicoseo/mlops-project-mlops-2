@@ -11,7 +11,7 @@ sys.path.append(
 )
 
 from src.api.middleware import register_middleware
-from src.api.routers import train, predict, reload
+from src.api.routers import train, predict, reload, airflow
 from src.ml.loader import get_model
 from src.utils.logger import get_logger
 
@@ -54,6 +54,7 @@ register_middleware(app)
 app.include_router(train.router)
 app.include_router(predict.router)
 app.include_router(reload.router)
+app.include_router(airflow.router)
 
 # 프로젝트 루트 경로 계산
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
