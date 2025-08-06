@@ -85,7 +85,7 @@ def model_save(model, all_params, model_params, tf_idf, embedding_module, genre2
     return dst
 
 
-def train_and_log_model(model_name, **kwargs):
+def train_and_log_model(model_name, local_save = False, **kwargs):
     init_mlflow(experiment_name = "movie_rating_final")
 
     if isinstance(model_name, str):
@@ -149,21 +149,21 @@ def train_and_log_model(model_name, **kwargs):
                 "valid_rmse": valid_rmse,
                 "test_rmse": test_rmse
             }
-
-        dst = model_save(
-            model = model,
-            all_params = all_params,
-            model_params = custom_params,
-            tf_idf = train_dataset.tf_idf,
-            embedding_module=train_dataset.embedding_module,
-            genre2idx=train_dataset.genre2idx,
-            timestamp = timestamp,
-            rmse = {
-                "train_rmse": train_rmse,
-                "valid_rmse": valid_rmse,
-                "test_rmse": test_rmse
-            }
-        )
+        if local_save:
+            dst = model_save(
+                model = model,
+                all_params = all_params,
+                model_params = custom_params,
+                tf_idf = train_dataset.tf_idf,
+                embedding_module=train_dataset.embedding_module,
+                genre2idx=train_dataset.genre2idx,
+                timestamp = timestamp,
+                rmse = {
+                    "train_rmse": train_rmse,
+                    "valid_rmse": valid_rmse,
+                    "test_rmse": test_rmse
+                }
+            )
 
         # 6. MLflow 메트릭 & 파라미터 로깅
 
