@@ -1,7 +1,7 @@
-from src.api import get_mlflow_model
+from src.api import get_mlflow_model2
 
 def test():    
-    model = get_mlflow_model()
+    model = get_mlflow_model2()
     print(model.metadata)
 
 def test2():

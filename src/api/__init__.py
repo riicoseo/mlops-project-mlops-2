@@ -35,5 +35,5 @@ app.include_router(predict.router)
 app.include_router(reload.router)
 
 
-def get_mlflow_model():
+def get_mlflow_model2():
     return mlflow_model
