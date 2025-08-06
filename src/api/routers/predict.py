@@ -21,8 +21,8 @@ class PredictRequest(BaseModel):
     adult: Optional[int] = Field(None, description="성인영화 여부 (0/1)")
     video: Optional[int] = Field(None, description="비디오 여부 (0/1)")
     original_language: Optional[str] = Field(None, description="원어(코드)")
-    genre_ids: Optional[List[int]] = Field(None, description="장르 id 리스트")
     overview: Optional[str] = Field(None, description="줄거리")
+    genre_ids: Optional[List[int]] = Field(None, description="장르 id 리스트")
 
 class PredictResponse(BaseModel):
     pred: float
@@ -33,7 +33,7 @@ async def predict_json(req: PredictRequest):
     features = {
         "adult": req.adult if req.adult is not None else 0,
         "video": req.video if req.video is not None else 0,
-        "is_english": req.original_language if req.original_language is not None else "en",
+        "original_language": req.original_language if req.original_language is not None else "en",
         "overview": req.overview if req.overview is not None else "",
         "genres": req.genre_ids if req.genre_ids is not None else [],
     }
