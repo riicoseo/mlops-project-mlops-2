@@ -1,0 +1,101 @@
+<!-- survey.html.backup - 원본 백업 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>영화 평점 예측 - 설문 입력</title>
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; background: #f5f6fa; display: flex; justify-content: center; align-items: center; height: 100vh;}
+    .survey-container { background: #fff; border-radius: 12px; padding: 40px 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); min-width: 350px;}
+    h2 { margin-bottom: 24px; color: #27408b;}
+    label { display: block; margin-bottom: 8px; margin-top: 16px; }
+    input, select, textarea { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 10px; }
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .checkbox-group label { margin: 0; }
+    button { width: 100%; background: #27408b; color: #fff; padding: 12px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #4169e1;}
+  </style>
+</head>
+<body>
+  <div class="survey-container">
+    <h2>영화 설문 입력</h2>
+    <form id="survey-form">
+      <label>성인영화 여부
+        <select name="adult">
+          <option value="">선택안함</option>
+          <option value="0">아니오</option>
+          <option value="1">예</option>
+        </select>
+      </label>
+      <label>장르 (복수 선택 가능)
+        <div class="checkbox-group">
+          <label><input type="checkbox" name="genre_ids" value="28"> 액션</label>
+          <label><input type="checkbox" name="genre_ids" value="35"> 코미디</label>
+          <label><input type="checkbox" name="genre_ids" value="18"> 드라마</label>
+          <label><input type="checkbox" name="genre_ids" value="16"> 애니메이션</label>
+          <label><input type="checkbox" name="genre_ids" value="14"> 판타지</label>
+          <label><input type="checkbox" name="genre_ids" value="53"> 스릴러</label>
+          <label><input type="checkbox" name="genre_ids" value="10751"> 가족</label>
+        </div>
+      </label>
+      <label>원어(언어)
+        <select name="original_language">
+          <option value="">선택안함</option>
+          <option value="ko">한국어</option>
+          <option value="en">영어</option>
+          <option value="ja">일본어</option>
+          <option value="zh">중국어</option>
+        </select>
+      </label>
+      <label>줄거리
+        <textarea name="overview" rows="3" placeholder="줄거리를 간단히 입력"></textarea>
+      </label>
+      <label>개봉일
+        <input type="date" name="release_date">
+      </label>
+      <label>비디오 여부
+        <select name="video">
+          <option value="">선택안함</option>
+          <option value="0">아니오</option>
+          <option value="1">예</option>
+        </select>
+      </label>
+      <button type="submit">예측하기</button>
+    </form>
+  </div>
+  <script>
+    document.getElementById('survey-form').addEventListener('submit', async function(e){
+      e.preventDefault();
+      // 입력값 수집 (일부만 있어도 OK)
+      const form = e.target;
+      const adult = form.adult.value === "" ? null : Number(form.adult.value);
+      const original_language = form.original_language.value === "" ? null : form.original_language.value;
+      const overview = form.overview.value.trim() === "" ? null : form.overview.value.trim();
+      const release_date = form.release_date.value === "" ? null : form.release_date.value;
+      const video = form.video.value === "" ? null : Number(form.video.value);
+      // 장르 (복수 선택)
+      const genreNodes = form.querySelectorAll('input[name="genre_ids"]:checked');
+      const genre_ids = Array.from(genreNodes).map(x=>Number(x.value));
+
+      const payload = {
+        adult, genre_ids: genre_ids.length ? genre_ids : null, original_language, overview, release_date, video
+      };
+
+      // API 연동: 예시로 /predict/json에 POST
+      try {
+        const res = await fetch('/predict/json', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('예측 요청 실패');
+        const data = await res.json();
+        // 결과페이지로 이동, 쿼리스트링 전달 (간단 구현)
+        window.location.href = `result.html?pred=${data.pred}`;
+      } catch (err) {
+        alert('예측 실패: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
