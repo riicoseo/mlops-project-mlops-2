@@ -22,7 +22,7 @@ class PredictRequest(BaseModel):
     video: Optional[int] = Field(None, description="비디오 여부 (0/1)")
     original_language: Optional[str] = Field(None, description="원어(코드)")
     overview: Optional[str] = Field(None, description="줄거리")
-    genre_ids: Optional[List[int]] = Field(None, description="장르 id 리스트")
+    genre_ids: Optional[List[str]] = Field(None, description="장르 id 리스트")
 
 class PredictResponse(BaseModel):
     pred: float
