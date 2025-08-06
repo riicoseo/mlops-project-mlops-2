@@ -12,9 +12,8 @@ from typing import Optional, List
 import pandas as pd 
 import numpy as np
 import json
-import ast
 
-# 팀원이 만든 모듈들 import
+# 팀원이 업데이트한 모듈들 import
 from src.ml.loader import get_model
 from src.dataset.movie_rating import get_genre_decode
 from src.utils.logger import get_logger
@@ -23,7 +22,7 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/predict")
 
 class PredictRequest(BaseModel):
-    """영화 정보 예측 요청 모델 - 팀원 전처리 코드와 호환"""
+    """영화 정보 예측 요청 모델 - 팀원 최신 코드와 호환"""
     adult: Optional[int] = Field(None, description="성인영화 여부 (0: 아니오, 1: 예)")
     video: Optional[int] = Field(None, description="비디오 여부 (0: 아니오, 1: 예)") 
     original_language: Optional[str] = Field(None, description="원어 코드 (ko, en, ja, zh 등)")
@@ -68,20 +67,20 @@ def convert_genre_ids_to_names(genre_ids: List[int]) -> List[str]:
         }
         return [fallback_mapping.get(gid, f"장르_{gid}") for gid in genre_ids]
 
-def prepare_model_input(req: PredictRequest) -> pd.DataFrame:
+def prepare_model_input_v2(req: PredictRequest) -> pd.DataFrame:
     """
-    프론트엔드 입력을 팀원의 MovieRatingModel이 기대하는 형식으로 변환
+    팀원의 최신 MovieRatingModel에 맞춰 입력 데이터 준비
+    - is_english와 overview_clean은 모델 내부에서 처리하므로 제외
+    - original_language는 그대로 전달 (모델에서 is_english로 변환)
     """
     
     # 기본값 설정
     adult_val = req.adult if req.adult is not None else 0
     video_val = req.video if req.video is not None else 0
     overview_val = req.overview if req.overview and req.overview.strip() else "영화 줄거리 정보 없음"
+    original_language_val = req.original_language if req.original_language else "en"
     
-    # 언어 처리 (영어인지 확인)
-    is_english = 1 if req.original_language == "en" else 0
-    
-    # 장르 처리 - 팀원의 MovieRatingModel.predict() 형식에 맞춤
+    # 장르 처리 - 팀원의 최신 MovieRatingModel.predict() 형식에 맞춤
     if req.genre_ids and len(req.genre_ids) > 0:
         # 장르 ID -> 장르 이름 변환
         genre_names = convert_genre_ids_to_names(req.genre_ids)
@@ -90,22 +89,22 @@ def prepare_model_input(req: PredictRequest) -> pd.DataFrame:
     else:
         genres_json = '["기타"]'  # 기본 장르
     
-    # 팀원의 MovieRatingModel이 기대하는 정확한 컬럼명과 형식
+    # 팀원의 최신 MovieRatingModel이 기대하는 정확한 컬럼명과 형식
     model_input = {
-        "overview": overview_val,        # 줄거리 텍스트
-        "genres": genres_json,           # JSON 문자열로 된 장르 리스트
-        "adult": float(adult_val),       # 성인영화 여부
-        "video": float(video_val),       # 비디오 여부  
-        "is_english": float(is_english)  # 영어 여부
+        "overview": overview_val,                    # 줄거리 (모델에서 clean_korean_text 적용)
+        "genres": genres_json,                       # JSON 문자열로 된 장르 리스트
+        "adult": float(adult_val),                   # 성인영화 여부
+        "video": float(video_val),                   # 비디오 여부  
+        "original_language": original_language_val   # 원어 (모델에서 is_english로 변환)
     }
     
-    logger.info(f"모델 입력 데이터 준비 완료: {model_input}")
+    logger.info(f"모델 입력 데이터 준비 완료 (v2): {model_input}")
     return pd.DataFrame([model_input])
 
 @router.post("/json", response_model=PredictResponse)
 async def predict_json(req: PredictRequest):
     """
-    팀원의 전처리 파이프라인을 사용한 영화 평점 예측
+    팀원의 최신 전처리 파이프라인을 사용한 영화 평점 예측
     
     - **adult**: 성인영화 여부 (0 또는 1)
     - **video**: 비디오 여부 (0 또는 1)  
@@ -118,19 +117,21 @@ async def predict_json(req: PredictRequest):
     try:
         logger.info(f"예측 요청 받음: {req}")
         
-        # 1. 입력 데이터를 팀원의 형식으로 전처리
-        model_input = prepare_model_input(req)
+        # 1. 입력 데이터를 팀원의 최신 형식으로 전처리
+        model_input = prepare_model_input_v2(req)
         
-        # 2. 팀원이 만든 MLflow 모델 로드
+        # 2. 팀원이 업데이트한 MLflow 모델 로드
         model = get_model()
         if model is None:
             raise HTTPException(
                 status_code=500, 
-                detail="모델이 로드되지 않았습니다. 서버 관리자에게 문의하세요."
+                detail="모델이 로드되지 않았습니다. MLflow 서버 및 모델 등록 상태를 확인하세요."
             )
         
-        # 3. 팀원의 MovieRatingModel.predict() 메서드 호출
-        logger.info("팀원의 전처리 파이프라인으로 예측 시작...")
+        # 3. 팀원의 최신 MovieRatingModel.predict() 메서드 호출
+        logger.info("팀원의 최신 전처리 파이프라인으로 예측 시작...")
+        
+        # 팀원의 최신 코드는 context를 첫 번째 인자로 받지 않음
         prediction_result = model.predict(model_input)
         
         # 4. 예측 결과 처리
@@ -150,13 +151,13 @@ async def predict_json(req: PredictRequest):
             "processed_genres": model_input.iloc[0]["genres"],
             "processed_adult": model_input.iloc[0]["adult"],
             "processed_video": model_input.iloc[0]["video"],
-            "processed_is_english": model_input.iloc[0]["is_english"]
+            "processed_original_language": model_input.iloc[0]["original_language"]
         }
         
         return PredictResponse(
             pred=round(pred_value, 2),
             status="success",
-            message=f"팀원의 전처리 파이프라인으로 예측 완료: {pred_value:.2f}점",
+            message=f"팀원의 최신 전처리 파이프라인으로 예측 완료: {pred_value:.2f}점",
             input_info=input_summary
         )
         
@@ -188,7 +189,8 @@ async def predict_health():
             "model_status": model_status,
             "genre_decode_count": genre_count,
             "service": "predict",
-            "pipeline": "팀원 전처리 파이프라인 연동"
+            "pipeline": "팀원 최신 전처리 파이프라인 연동",
+            "version": "v2 - updated for latest MovieRatingModel"
         }
     except Exception as e:
         return {
@@ -199,7 +201,7 @@ async def predict_health():
 
 @router.get("/sample")
 async def predict_sample():
-    """팀원 파이프라인으로 샘플 데이터 예측 테스트"""
+    """팀원 최신 파이프라인으로 샘플 데이터 예측 테스트"""
     sample_request = PredictRequest(
         adult=0,
         video=0,
