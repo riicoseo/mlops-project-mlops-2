@@ -179,7 +179,7 @@ def train_and_log_model(model_name, **kwargs):
             "genres": '["액션", "모험"]',
             "adult": 0.0,
             "video": 0.0,
-            "is_english": 1.0
+            "original_language": "kr"
         }])
 
         signature = ModelSignature(
@@ -188,7 +188,7 @@ def train_and_log_model(model_name, **kwargs):
                 ColSpec("string", "genres"),
                 ColSpec("double", "adult"),
                 ColSpec("double", "video"),
-                ColSpec("double", "is_english")
+                ColSpec("string", "original_language")
             ]),
             outputs=Schema([ColSpec("double")])
         )
