@@ -42,10 +42,11 @@ class MovieRatingModel(mlflow.pyfunc.PythonModel):
 
     def predict(self, context, model_input):
         results = []
-
+        model_input['is_english'] = (model_input['original_language'] == 'en').astype(int)
+        model_input['overview_clean'] = model_input['overview'].fillna("").apply(movie_rating.MovieRatingDataset.clean_korean_text)
         for _, row in model_input.iterrows():
-            overview_clean = movie_rating.MovieRatingDataset.clean_korean_text(row["overview"])
-            overview_vec = self.tf_idf.transform([overview_clean])
+            # overview 처리
+            overview_vec = self.tf_idf.transform([row['overview_clean']])
 
             # genres 처리
             raw_genres = row["genres"]

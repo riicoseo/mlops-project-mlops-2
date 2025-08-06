@@ -246,8 +246,8 @@ def get_datasets(path="cache", use_cache=True):
 
 if __name__ == "__main__":
     print('test 중 입니다.')
-    train, valid, test = get_datasets()
-    print("train set 첫번째 행 : ", train.features.columns)
-    print("valid set 첫번째 행 : ", valid[0])
+    # train, valid, test = get_datasets()
+    # print("train set 첫번째 행 : ", train.features.columns)
+    # print("valid set 첫번째 행 : ", valid[0])
     # print("test set 첫번째 행 : ", test[0])
-    print(get_genre_decode())
+    print([i for i, j in get_genre_decode().items()])
