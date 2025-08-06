@@ -1,0 +1,56 @@
+name: Deploy to Airflow Server
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ closed ]
+    paths:
+      - 'airflow/**'
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "[START] deployment to Airflow Server"
+      run: echo "Starting deployment to Airflow Server..."  
+
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: "[SUCCESS] Checkout"
+      run: echo "[SUCCESS] checkout to main branch"    
+
+    - name: Install SSH Key
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.AIRFLOW_SSH_KEY }}
+
+    - name: Connecting to Airflow Server for deployment
+      run: echo "Connecting to Airflow Server for deployment"
+
+    - name: Deploy to Airflow Server
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.AIRFLOW_USER }}@${{ secrets.AIRFLOW_HOST }} << 'EOF'
+          set -e
+
+          echo "\$0"
+
+          echo "Moving to project directory..."
+          cd "C:\Users\pc\yoonseo\repository\mlops-project-mlops-2"
+
+          echo ""
+          branch_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+          echo "[Airflow Server][Branch][now] : $branch_name"
+          echo ""
+
+          echo "[Airflow Server][Branch][checkout]"
+          git fetch origin main
+          git checkout -B main origin/main
+
+          echo ""
+          echo "[Airflow Server][Recent Commit info] : $(git log -1 --oneline)"
+          echo ""
+        
+        EOF
