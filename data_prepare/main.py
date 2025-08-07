@@ -1,10 +1,14 @@
 import os
+import sys
+
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+
 import pandas as pd
 from dotenv import load_dotenv
 
 from src.utils.utils import project_path
-
-# from preprocessing import TMDBPreProcessor
 from data_prepare.crawler import TMDBCrawler
 
 load_dotenv()
