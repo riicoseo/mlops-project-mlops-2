@@ -1,0 +1,71 @@
+services:
+  postgres:
+    container_name: airflow-postgres
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mlflow_default
+
+  airflow-webserver:
+    container_name: airflow-webserver
+    image: apache/airflow:2.9.2
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      TZ: Asia/Seoul
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: Asia/Seoul
+      AIRFLOW__CORE__DEFAULT_UI_TIMEZONE: Asia/Seoul
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+      AIRFLOW__CORE__PARALLELISM: "2"
+      AIRFLOW__CORE__DAG_CONCURRENCY: "2"
+      AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: "1"
+      PYTHONPATH: "/opt/airflow/dags"
+    volumes:
+      - C:/Users/pc/yoonseo/repository/mlops-project-mlops-2/airflow/dags:/opt/airflow/dags
+    ports:
+      - "8090:8080"
+    command: webserver
+    networks:
+      - mlflow_default
+
+  airflow-scheduler:
+    container_name: airflow-scheduler
+    image: apache/airflow:2.9.2
+    restart: always
+    depends_on:
+      - postgres
+      - airflow-webserver
+    environment:
+      TZ: Asia/Seoul
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: Asia/Seoul
+      AIRFLOW__CORE__DEFAULT_UI_TIMEZONE: Asia/Seoul
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+      AIRFLOW__CORE__PARALLELISM: "2"
+      AIRFLOW__CORE__DAG_CONCURRENCY: "2"
+      AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: "1"
+      PYTHONPATH: "/opt/airflow/dags"
+    volumes:
+      - C:/Users/pc/yoonseo/repository/mlops-project-mlops-2/airflow/dags:/opt/airflow/dags
+    command: scheduler
+    networks:
+      - mlflow_default
+
+volumes:
+  postgres_data:
+
+networks:
+  mlflow_default:
+    external: true
