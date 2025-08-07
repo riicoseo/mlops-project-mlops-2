@@ -9,6 +9,8 @@ sys.path.append(
 # Pandas 호환성 문제 해결
 import warnings
 warnings.filterwarnings('ignore')
+from src.api import state
+
 
 try:
     import pandas as pd
@@ -46,7 +48,7 @@ import json
 
 # 팀원이 업데이트한 모듈들 import (try-catch로 안전하게)
 try:
-    from src.ml.loader import get_model
+    # from src.ml.loader import get_model
     from src.dataset.movie_rating import get_genre_decode
     from src.utils.logger import get_logger
     print("✅ 모든 모듈 import 성공")
@@ -155,7 +157,7 @@ async def predict_json(req: PredictRequest):
         logger.info(f"입력 데이터 준비 완료: {model_input.dtypes}")
         
         # 2. 모델 로드
-        model = get_model()
+        model = state.mlflow_model
         if model is None:
             raise HTTPException(
                 status_code=500, 
@@ -212,7 +214,7 @@ async def predict_health():
         pandas_version = pd.__version__
         
         # 모델 상태 확인
-        model = get_model()
+        model = state.mlflow_model
         model_status = "loaded" if model is not None else "not_loaded"
         
         # 장르 디코딩 확인
