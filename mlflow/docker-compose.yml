@@ -1,0 +1,40 @@
+services:
+  mlflow-tracking:
+    build:
+      context: ./tracking          
+      dockerfile: Dockerfile
+    container_name: mlflow-tracking
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlruns   
+      - ./mlflow_db:/mlflow_db
+    environment:
+      - BACKEND_STORE_URI=sqlite:////mlflow_db/mlflow.db.sqlite
+      - ARTIFACTS_DESTINATION=/mlruns
+    restart: unless-stopped
+    networks:
+      - mlflow_network  
+
+  mlflow-serving:
+    build: 
+      context: ./serving
+      dockerfile: Dockerfile
+    container_name: mlflow-serving
+    ports:
+      - "5001:5001"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow-tracking:5000
+      - MODEL_URI=models:/best_model/Production
+    depends_on:
+      - mlflow-tracking
+    restart: unless-stopped    
+    networks:
+      - mlflow_network  
+
+networks:
+  mlflow_network:
+    external: true
+    name: mlflow_default
+
+
