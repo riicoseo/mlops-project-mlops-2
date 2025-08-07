@@ -14,25 +14,25 @@ from src.api.middleware import register_middleware
 from src.api.routers import train, predict, reload, airflow
 from src.ml.loader import get_model
 from src.utils.logger import get_logger
+from src.api import state
 
 logger = get_logger(__name__)
 
-mlflow_model = None
 
 @asynccontextmanager
 async def lifespan(app):
-    global mlflow_model
     logger.info("서버 시작 Step")
     logger.info("[START] loading mlflow model")
 
     # MLflow 모델 로딩 (에러 처리 추가)
     try:
-        mlflow_model = get_model()
+        model = get_model()
+        state.mlflow_model = model
         logger.info(f"[END] mlflow model loaded successfully")
     except Exception as e:
         logger.warning(f"MLflow 모델 로딩 실패: {e}")
         logger.info("모델 없이 서버를 시작합니다.")
-        mlflow_model = None
+        state.mlflow_model = None
 
     yield
 
@@ -566,8 +566,3 @@ async def health_check():
         "service": "영화 평점 예측 서비스",
         "frontend_available": os.path.exists(frontend_path)
     }
-
-# 전역 변수로 mlflow_model을 앱에서 접근 가능하게 만들기
-def get_mlflow_model():
-    """MLflow 모델 인스턴스 반환"""
-    return mlflow_model
