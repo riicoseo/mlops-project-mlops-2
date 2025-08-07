@@ -11,7 +11,7 @@
 ![LightGBM](https://img.shields.io/badge/LightGBM-Latest-2ECC71?style=for-the-badge)
 
 **📅 프로젝트 기간:** 2025.07.29 ~ 2025.08.07  
-**🚀 배포 링크:** [영화 평점 예측 서비스](http://3.35.129.98:8000/page)  
+**🚀 서비스 페이지 링크:** [영화 평점 예측 서비스](http://3.35.129.98:8000/pages)  
 
 </div>
 
@@ -31,7 +31,7 @@
 ### **👥 사용자 시나리오**
 1. **영화 정보 입력** → 성인영화 여부, 장르, 언어, 비디오 여부 등 입력
 2. **AI 평점 예측** → 세 가지 모델을 Cross check 하여 실시간 Champion 평점 예측 (0-10점)
-3. **결과 시각화** → 예측 평점과 신뢰도, 유사 영화 추천 제공
+3. **결과 시각화** → 예측 평점과 신뢰도 시각화
 
 ---
 
@@ -52,64 +52,35 @@
 ### **🎨 Frontend**
 - **웹 인터페이스**: Vanilla HTML/CSS/JavaScript
 - **UI/UX**: 반응형 디자인, 실시간 결과 시각화
-- **차트**: Chart.js 기반 예측 결과 시각화
+
 
 ### **🔄 MLOps Pipeline**
-- **워크플로우 관리**: Apache Airflow
-- **CI/CD**: GitHub Actions (자동 배포, 테스트)
+- **워크플로우 관리**: Airflow
+- **모델 관리**: MLflow
 - **컨테이너화**: Docker (개발/배포 환경 일치)
+- **백엔드 서버**: Fast API
+- **CI/CD**: GitHub Actions (자동 배포)
 - **모니터링**: 모델 성능 추적, 데이터 드리프트 감지
 
 ### **☁️ 클라우드 & DevOps**
 - **배포 환경**: AWS EC2 (Ubuntu 20.04), Windows Docker engine (Windows 11)
 - **버전 관리**: Git (팀 레포지토리 Branch → main PR 방식)
-- **프로젝트 관리**: Git, Jira (스프린트 관리, 이슈 트래킹)
-- **환경 관리**: Conda (Python 3.11.13 환경)
+- **프로젝트 관리**: Github, Jira (스프린트 관리, 이슈 트래킹)
+- **환경 관리**: Conda (Python 3.10.13 환경)
 
 ---
 
-## 🏗️ **시스템 아키텍처**
 
-```mermaid
-graph TB
-    subgraph "Data Layer"
-        A[TMDB API] --> B[Daily Crawler]
-        B --> C[Raw Data Storage]
-        C --> D[Data Preprocessing]
-    end
-    
-    subgraph "ML Pipeline"
-        D --> E[Feature Engineering]
-        E --> F[Model Training]
-        F --> G[MLflow Registry]
-        G --> H[Model Validation]
-    end
-    
-    subgraph "Service Layer"
-        H --> I[FastAPI Server]
-        I --> J[Prediction Endpoint]
-        I --> K[Training Endpoint]
-        I --> L[Web Interface]
-    end
-    
-    subgraph "Orchestration"
-        M[Airflow Scheduler] --> B
-        M --> F
-        M --> N[Model Reload]
-    end
-    
-    subgraph "Infrastructure"
-        O[AWS EC2] --> I
-        P[GitHub Actions] --> O
-        Q[Docker] --> O
-    end
-```
+## 🏗️ **시스템 아키텍처**
+![alt text](최종아키텍쳐2.jpg)
+
+
 
 ### **📊 데이터 플로우**
-1. **수집**: TMDB API → 인기 영화 데이터 수집 (매일 자동)
+1. **수집**: TMDB API → 인기 영화 데이터 크롤링 (매일 자동)
 2. **전처리**: 텍스트 정규화, 장르 임베딩, 결측값 처리
 3. **학습**: 특성 추출 → 모델 학습 → 성능 평가 → MLflow 등록
-4. **배포**: 최적 모델 자동 선택 → 서비스 업데이트
+4. **배포**: 최적 모델 선택 → 서비스 업데이트
 5. **추론**: 사용자 입력 → 전처리 → 예측 → 결과 반환
 
 ---
@@ -129,6 +100,8 @@ feature_groups = {
 ---
 
 ## 🚀 **MLOps 파이프라인**
+### **⏰ MLflow 모델 관리**
+![alt text](image-2.png)
 
 ### **⏰ Airflow DAG 구성**
 ```python
@@ -141,17 +114,14 @@ daily_pipeline = {
     "performance_monitoring": "성능 지표 추적"
 }
 ```
+![alt text](image-3.png)
 
 ### **🔄 CI/CD 워크플로우**
 1. **Pull Request** → `main` 브랜치 병합 시 자동 트리거
 2. **배포 과정**: 코드 체크아웃 → 의존성 설치 → 서비스 재시작
-3. **헬스 체크**: 배포 후 API 엔드포인트 상태 확인
-4. **롤백 전략**: 실패 시 이전 버전 자동 복구
+3. **헬스 체크**: 배포 후 API 엔드포인트 상태 확인  
 
-### **📊 모델 모니터링**
-- **성능 추적**: 실시간 예측 정확도 모니터링
-- **데이터 드리프트**: 입력 분포 변화 감지
-- **자동 재학습**: 성능 임계값 하락 시 자동 트리거
+![alt text](image-4.png)
 
 ---
 
@@ -159,11 +129,11 @@ daily_pipeline = {
 
 | 이름 | 역할 | GitHub | 핵심 담당 업무 |
 |------|------|--------|---------------|
-| **김수환** | 팀장 / ML Engineer | [@suhwan](https://github.com/suhwan) | ML 엔지니어링, 모델 개발, 프로젝트 매니징(PM) |
+| **김수환** | 팀장 / ML Engineer | [@suhwan](https://github.com/suhwankimkim) | ML 엔지니어링, 모델 개발, 프로젝트 매니징(PM) |
 | **Claude & ChatGPT** | 부팀장 / AI Tutors | [@anthropic](https://github.com/anthropic) | 튜터, 멘토링, 시니어 프로젝트 매니저(SPM) |
-| **김병현** | Frontend Engineer | [@byeonghyeon](https://github.com/byeonghyeon) | 프론트엔드 개발, 환경 구성, Git 관리 |
-| **이윤서** | Backend Engineer | [@yoon](https://github.com/yoon) | CI/CD 파이프라인, 백엔드 서버 개발 |
-| **이가은** | Documentation Engineer | [@gaeun](https://github.com/gaeun) | CI/CD 구축, 기술 문서 작성, 프로젝트 문서화 |
+| **김병현** | Frontend Engineer | [@byeonghyeon](https://github.com/Bkankim) | 프론트엔드 개발, 환경 구성, Git 관리 |
+| **이윤서** | MLOps Engineer & Backend Developer| [@yoonseo](https://github.com/riicoseo) | Airflow & MLflow & Docker 구축, CI/CD 파이프라인, FastAPI 서버 개발 |
+| **이가은** | Documentation Engineer | [@gaeun](https://github.com/kkaeunii) | CI/CD 구축, 기술 문서 작성, 프로젝트 문서화 |
 
 ### **🤖 혁신적 AI 협업 모델**
 본 프로젝트는 **인간-AI 하이브리드 팀워크**의 선구적 사례입니다:
@@ -206,13 +176,24 @@ python src/main.py train all
 ```
 
 ### **4. 웹 서비스 접속**
-- **메인 페이지**: http://localhost:8000/page
-- **API 문서**: http://localhost:8000/docs
-- **예측 페이지**: http://localhost:8000/survey
+![alt text](image-1.png)  
+
+- **메인 페이지**: http://3.35.129.98:8000/pages  
+
+- **API 문서**: http://3.35.129.98:8000/docs
+
+- **예측 페이지**: http://3.35.129.98:8000/pages/survey  
+
+- **Easy Model Training 페이지**: http://3.35.129.98:8000/pages/easytest  
 
 ---
 
 ## 📈 **주요 성과 및 인사이트**
+
+### **🔍 기술적 인사이트**
+- **장르 임베딩**: 딥러닝 기반 장르 임베딩이 성능 향상에 기여 (+0.15 RMSE 개선)
+- **텍스트 특성**: 영화 줄거리 TF-IDF 특성이 예측력 향상에 중요
+- **메타데이터 활용**: 예산, 런타임 등 메타데이터가 평점 예측에 강한 상관관계
 
 ### **🎯 비즈니스 임팩트**
 - **예측 정확도**: RMSE 0.95 달성 (10점 만점 기준 ±1점 오차)
@@ -220,22 +201,15 @@ python src/main.py train all
 - **시스템 안정성**: 99.5% 업타임 달성
 - **자동화율**: 100% 자동화된 데이터 파이프라인
 
-### **🔍 기술적 인사이트**
-- **장르 임베딩**: 딥러닝 기반 장르 임베딩이 성능 향상에 기여 (+0.15 RMSE 개선)
-- **텍스트 특성**: 영화 줄거리 TF-IDF 특성이 예측력 향상에 중요
-- **메타데이터 활용**: 예산, 런타임 등 메타데이터가 평점 예측에 강한 상관관계
+### **💡 신규 기능 출시**
+- **Easy Model Training 페이지**
+    - 데이터 사이언티스트를 위한 모델 train 웹UI 제공
+    - ML 모델의 하이퍼 파라미터 자유 셋팅 가능!
+    - ML 모델 선택 가능!
+    - http://3.35.129.98:8000/pages/easytest
+    ![alt text](image.png)
 
-### **📊 운영 지표**
-```python
-# 서비스 KPI (최근 3일)
-service_metrics = {
-    "총 예측 요청": "523건",
-    "평균 응답시간": "47ms",
-    "예측 정확도": "94.2%",
-    "시스템 가용성": "99.7%",
-    "자동 재학습": "3회 실행"
-}
-```
+
 
 ---
 
@@ -300,11 +274,11 @@ service_metrics = {
 [![Build Status](https://img.shields.io/badge/Build-Passing-success?style=for-the-badge)](https://github.com/your-team/mlops-project-mlops-2/actions)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-**🚀 [서비스 체험하기](http://3.35.129.98:8000/page) | 📚 [API 문서](http://3.35.129.98:8000/docs) | 🎯 [프로젝트 보드](https://your-jira-link.atlassian.net)**
+**🚀 [서비스 체험하기](http://3.35.129.98:8000/page) | 📚 [API 문서](http://3.35.129.98:8000/docs)**
 
 ---
 
 *Made with ❤️ by Team MLOps-2 | 2025*  
-*Powered by Human-AI Collaboration*
+
 
 </div>
