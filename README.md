@@ -114,14 +114,16 @@ daily_pipeline = {
     "performance_monitoring": "성능 지표 추적"
 }
 ```
-![alt text](image-3.png)
+![alt text](image-9.png)
+![alt text](image-7.png)
+![alt text](image-10.png)
 
 ### **🔄 CI/CD 워크플로우**
 1. **Pull Request** → `main` 브랜치 병합 시 자동 트리거
 2. **배포 과정**: 코드 체크아웃 → 의존성 설치 → 서비스 재시작
 3. **헬스 체크**: 배포 후 API 엔드포인트 상태 확인  
 
-![alt text](image-4.png)
+![alt text](image-8.png)
 
 ---
 
