@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Easy 모델 실험 도구</title>
+  <style>
+    body {
+      font-family: 'Malgun Gothic', sans-serif;
+      background: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .experiment-container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 40px 30px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      max-width: 700px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      color: #27408b;
+      margin-bottom: 24px;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 16px;
+      display: block;
+    }
+    select, input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .param-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .param-row select,
+    .param-row input.param-name,
+    .param-row input.param-value {
+      flex: 1;
+      min-width: 140px;
+    }
+    .param-row input.param-name {
+      display: none;
+    }
+    .param-row button {
+      background: #888;
+      color: white;
+      border: none;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .param-row button:hover {
+      background: #666;
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    button {
+      background: #27408b;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      flex: 1;
+    }
+    button:hover {
+      background: #4169e1;
+    }
+    .result {
+      margin-top: 24px;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+      text-align: center;
+      color: white;
+      display: none;
+      animation: fadeIn 0.5s ease-out;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .result h3 {
+      margin: 0 0 10px 0;
+      font-size: 20px;
+    }
+    .result .score {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .result .message {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .result .url a {
+        display: inline-block;
+        padding: 14px 24px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid white;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s, transform 0.2s;
+        margin-top: 16px;
+    }
+
+    .result .url a:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.03);
+    }
+    
+    .result a {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+
+    #add-param-btn {
+    margin-top: 70px; 
+    }
+
+    .btn-row {
+    margin-top: 100px; 
+    }
+  </style>
+</head>
+<body>
+  <div class="experiment-container">
+    <h2>🧪 Easy 모델 실험 도구</h2>
+
+    <form id="experiment-form">
+      <label>모델 선택</label>
+      <select name="model_name" id="model_name" required>
+        <option value="">선택하세요</option>
+        <option value="xgboost">XGBoost</option>
+        <option value="lightgbm">LightGBM</option>
+        <option value="randomforest">RandomForest</option>
+      </select>
+
+      <label>하이퍼파라미터</label>
+      <div id="params-container"></div>
+      <button type="button" id="add-param-btn">+ 파라미터 추가</button>
+
+      <div class="btn-row">
+        <button type="submit">🚀 실험 실행</button>
+        <button type="button" id="reset-btn">🔄 초기화</button>
+      </div>
+    </form>
+
+    <div id="result" class="result">
+      <h3>📊 실험 결과</h3>
+      <div class="score" id="rmse-score">-</div>
+      <div class="message" id="rmse-message"></div>
+      <div class="url" id="mlflow-link"></div>
+    </div>
+  </div>
+
+  <script>
+    const modelParams = {
+      xgboost: ['learning_rate', 'max_depth', 'n_estimators', 'subsample', 'colsample_bytree'],
+      lightgbm: ['learning_rate', 'num_leaves', 'max_depth', 'min_data_in_leaf', 'feature_fraction'],
+      randomforest: ['n_estimators', 'max_depth', 'min_samples_split', 'min_samples_leaf']
+    };
+
+    const modelSelect = document.getElementById('model_name');
+    const paramsContainer = document.getElementById('params-container');
+    const addParamBtn = document.getElementById('add-param-btn');
+    const resultBox = document.getElementById('result');
+
+    function getSelectedParams() {
+      return Array.from(paramsContainer.querySelectorAll('select.param-select'))
+        .map(sel => sel.value)
+        .filter(v => v && v !== 'custom');
+    }
+
+    function updateParamSelectOptions(selectEl, paramOptions, keepValue = true) {
+      const selectedParams = getSelectedParams().filter(v => v !== selectEl.value);
+      const currentVal = keepValue ? selectEl.value : "";
+      selectEl.innerHTML = '<option value="">파라미터명 선택</option>' +
+        paramOptions.filter(p => !selectedParams.includes(p))
+                    .map(p => `<option value="${p}">${p}</option>`).join('') +
+        '<option value="custom">직접 입력</option>';
+      if (keepValue && currentVal) selectEl.value = currentVal;
+    }
+
+    function refreshAllParamSelects() {
+      const options = modelParams[modelSelect.value] || [];
+      paramsContainer.querySelectorAll('select.param-select').forEach(sel => {
+        updateParamSelectOptions(sel, options, true);
+      });
+    }
+
+    function addParamRow(paramOptions = []) {
+      const row = document.createElement('div');
+      row.className = 'param-row';
+
+      const paramSelect = document.createElement('select');
+      paramSelect.className = 'param-select';
+      updateParamSelectOptions(paramSelect, paramOptions);
+
+      const nameInput = document.createElement('input');
+      nameInput.className = 'param-name';
+      nameInput.type = 'text';
+      nameInput.placeholder = '파라미터명 직접 입력';
+
+      const valueInput = document.createElement('input');
+      valueInput.className = 'param-value';
+      valueInput.type = 'text';
+      valueInput.placeholder = '값 입력';
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = '삭제';
+      removeBtn.onclick = () => {
+        row.remove();
+        refreshAllParamSelects();
+      };
+
+      paramSelect.addEventListener('change', () => {
+        if (paramSelect.value === 'custom') {
+          nameInput.style.display = 'block';
+        } else {
+          nameInput.style.display = 'none';
+        }
+        refreshAllParamSelects();
+      });
+
+      row.appendChild(paramSelect);
+      row.appendChild(nameInput);
+      row.appendChild(valueInput);
+      row.appendChild(removeBtn);
+      paramsContainer.appendChild(row);
+    }
+
+    modelSelect.addEventListener('change', () => {
+      paramsContainer.innerHTML = '';
+      resultBox.style.display = 'none';
+      if (modelSelect.value) {
+        addParamRow(modelParams[modelSelect.value]);
+      }
+    });
+
+    addParamBtn.addEventListener('click', () => {
+      if (!modelSelect.value) {
+        alert('모델을 먼저 선택하세요.');
+        return;
+      }
+      addParamRow(modelParams[modelSelect.value]);
+    });
+
+    document.getElementById('experiment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const rows = paramsContainer.querySelectorAll('.param-row');
+      const params = {};
+      rows.forEach(row => {
+        let name = row.querySelector('select').value;
+        if (name === 'custom') {
+          name = row.querySelector('.param-name').value.trim();
+        }
+        const value = row.querySelector('.param-value').value.trim();
+        if (name && value !== '') {
+          const numVal = Number(value);
+          params[name] = isNaN(numVal) ? value : numVal;
+        }
+      });
+
+      const payload = {
+        model_name: modelSelect.value,
+        training_params: params
+      };
+
+      try {
+        const res = await fetch('http://3.35.129.98:8000/train', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('API 호출 실패');
+
+        const data = await res.json();
+        const rmse = Number(data.rmse);
+        let message = '';
+        if (rmse <= 0.4) message = '✅ 매우 우수한 모델입니다!';
+        else if (rmse <= 0.6) message = '👍 꽤 괜찮은 성능이에요.';
+        else if (rmse <= 0.8) message = '😐 기본적인 수준은 만족합니다.';
+        else message = '⚠️ 성능 개선이 필요해 보입니다.';
+
+        // document.getElementById('rmse-score').textContent = `RMSE: ${rmse.toFixed(4)}`;
+        // document.getElementById('rmse-message').textContent = message;
+        document.getElementById('rmse-score').textContent = "";
+        document.getElementById('rmse-message').textContent = "";
+        document.getElementById('mlflow-link').innerHTML = `<a href="http://14.38.177.115:5000/#/experiments/4" target="_blank">📂 MLflow 실험 결과 보기</a>`;
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        alert('예측 실패: ' + err.message);
+      }
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      document.getElementById('experiment-form').reset();
+      paramsContainer.innerHTML = '';
+      resultBox.style.display = 'none';
+    });
+  </script>
+</body>
+</html>

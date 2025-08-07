@@ -16,9 +16,9 @@ def register_middleware(app):
 
     @app.middleware("http")
     async def log_req_res(request: Request, call_next):
-        logger.info(f"[Req] {request.method} {request.url}")
+        logger.info(f"[Request] {request.method} {request.url}")
         response = await call_next(request)
-        logger.info(f"[Res] {response.status_code}")
+        logger.info(f"[Response] {request.method} {request.url} , [Status_code] {response.status_code}")
         return response
     
     
