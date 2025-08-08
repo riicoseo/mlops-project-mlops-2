@@ -276,7 +276,7 @@ python src/main.py train all
 [![Build Status](https://img.shields.io/badge/Build-Passing-success?style=for-the-badge)](https://github.com/your-team/mlops-project-mlops-2/actions)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-**🚀 [서비스 체험하기](http://3.35.129.98:8000/page) | 📚 [API 문서](http://3.35.129.98:8000/docs)**
+**🚀 [서비스 체험하기](http://3.35.129.98:8000/pages) | 📚 [API 문서](http://3.35.129.98:8000/docs)**
 
 ---
 
