@@ -72,7 +72,7 @@
 
 
 ## 🏗️ **시스템 아키텍처**
-![alt text](최종아키텍쳐2.jpg)
+![alt text](docs_image/MLOps_Architecture.jpg)
 
 
 
@@ -101,7 +101,7 @@ feature_groups = {
 
 ## 🚀 **MLOps 파이프라인**
 ### **⏰ MLflow 모델 관리**
-![alt text](image-2.png)
+![alt text](docs_image/image-2.png)
 
 ### **⏰ Airflow DAG 구성**
 ```python
@@ -114,16 +114,16 @@ daily_pipeline = {
     "performance_monitoring": "성능 지표 추적"
 }
 ```
-![alt text](image-9.png)
-![alt text](image-7.png)
-![alt text](image-10.png)
+![alt text](docs_image/image-9.png)
+![alt text](docs_image/image-7.png)
+![alt text](docs_image/image-10.png)
 
 ### **🔄 CI/CD 워크플로우**
 1. **Pull Request** → `main` 브랜치 병합 시 자동 트리거
 2. **배포 과정**: 코드 체크아웃 → 의존성 설치 → 서비스 재시작
 3. **헬스 체크**: 배포 후 API 엔드포인트 상태 확인  
 
-![alt text](image-8.png)
+![alt text](docs_image/image-8.png)
 
 ---
 
@@ -178,7 +178,7 @@ python src/main.py train all
 ```
 
 ### **4. 웹 서비스 접속**
-![alt text](image-1.png)  
+![alt text](docs_image/image-1.png)  
 
 - **메인 페이지**: http://3.35.129.98:8000/pages  
 
@@ -209,7 +209,7 @@ python src/main.py train all
     - ML 모델의 하이퍼 파라미터 자유 셋팅 가능!
     - ML 모델 선택 가능!
     - http://3.35.129.98:8000/pages/easytest
-    ![alt text](image.png)
+    ![alt text](docs_image/image.png)
 
 
 
