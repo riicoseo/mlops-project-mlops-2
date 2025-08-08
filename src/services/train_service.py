@@ -6,7 +6,7 @@ logger = get_logger(__name__)
 def run_training_job(model_name: str, **kwargs):
     try:
         logger.info(f"[START] run traing job : model_name={model_name}")
-        train_and_log_model(model_name, **kwargs)
+        train_and_log_model(model_name, local_save=True, **kwargs)
         logger.info(f"[END] SUCCESS training : model_name={model_name}")
     except Exception as e:
         logger.error(f"[ERROR] fail to training model")

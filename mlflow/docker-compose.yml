@@ -12,6 +12,7 @@ services:
     environment:
       - BACKEND_STORE_URI=sqlite:////mlflow_db/mlflow.db.sqlite
       - ARTIFACTS_DESTINATION=/mlruns
+      - GUNICORN_OPTS=--timeout 600 --workers 2 --keep-alive 5
     restart: unless-stopped
     networks:
       - mlflow_network  
